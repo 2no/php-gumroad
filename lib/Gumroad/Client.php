@@ -15,13 +15,13 @@ class Client
 
     public  $token;
     public  $endpoint;
-    private $timeout;
+    private $_timeout;
 
     public function __construct()
     {
         $this->token    = null;
         $this->endpoint = self::END_POINT;
-        $this->timeout  = 2000;
+        $this->_timeout = 2000;
     }
 
     public function getAuthenticateUrl()
@@ -41,14 +41,14 @@ class Client
     public function setTimeout($timeout)
     {
         if (is_numeric($timeout)) {
-            $this->timeout = $timeout < 0 ? 1 : (int)$timeout;
+            $this->_timeout = $timeout < 0 ? 1 : (int)$timeout;
         }
         return $this;
     }
 
     public function getTimeout()
     {
-        return $this->timeout;
+        return $this->_timeout;
     }
 
     public function authenticate($email, $password)
@@ -196,7 +196,7 @@ class Client
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $this->timeout);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $this->_timeout);
         $response = curl_exec($ch);
 
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
