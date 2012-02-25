@@ -3,7 +3,7 @@
 namespace Gumroad;
 
 /**
- * API Client
+ * Gumroad API Client
  *
  * @package Gumroad
  * @author  Kazunori Ninomiya <kazunori.ninomiya@gmail.com>
@@ -13,13 +13,15 @@ class Client
 {
     const END_POINT = 'https://gumroad.com/api/v1';
 
-    public $token;
-    public $endpoint;
+    public  $token;
+    public  $endpoint;
+    private $timeout;
 
     public function __construct()
     {
         $this->token    = null;
         $this->endpoint = self::END_POINT;
+        $this->timeout  = 2000;
     }
 
     public function getAuthenticateUrl()
@@ -34,6 +36,19 @@ class Client
             $url .= '/' . $id;
         }
         return $url;
+    }
+
+    public function setTimeout($timeout)
+    {
+        if (is_numeric($timeout)) {
+            $this->timeout = $timeout < 0 ? 1 : (int)$timeout;
+        }
+        return $this;
+    }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
     }
 
     public function authenticate($email, $password)
@@ -72,6 +87,10 @@ class Client
         $link->description = $response->link->description;
         $link->currency    = $response->link->currency;
         $link->shortUrl    = $response->link->short_url;
+        $link->views       = $response->link->views;
+        $link->previewUrl  = $response->link->preview_url;
+        $link->purchases   = $response->link->purchases;
+        $link->balance     = $response->link->balance;
 
         return $this;
     }
@@ -100,6 +119,25 @@ class Client
         return $this;
     }
 
+    public function getLink($id)
+    {
+        $url = $this->getLinkUrl($id);
+        $response = $this->_request('GET', $url);
+        return new Link(array(
+            'id'          => $response->link->id,
+            'name'        => $response->link->name,
+            'url'         => $response->link->url,
+            'price'       => $response->link->price,
+            'description' => $response->link->description,
+            'currency'    => $response->link->currency,
+            'shortUrl'    => $response->link->short_url,
+            'views'       => $response->link->views,
+            'previewUrl'  => $response->link->preview_url,
+            'purchases'   => $response->link->purchases,
+            'balance'     => $response->link->balance
+        ));
+    }
+
     public function getLinks()
     {
         $url = $this->getLinkUrl();
@@ -114,7 +152,11 @@ class Client
                 'price'       => $link->price,
                 'description' => $link->description,
                 'currency'    => $link->currency,
-                'shortUrl'    => $link->short_url
+                'shortUrl'    => $link->short_url,
+                'views'       => $link->views,
+                'previewUrl'  => $link->preview_url,
+                'purchases'   => $link->purchases,
+                'balance'     => $link->balance
             ));
         }
         return $links;
@@ -154,7 +196,7 @@ class Client
 
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 2);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, $this->timeout);
         $response = curl_exec($ch);
 
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

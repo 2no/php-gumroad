@@ -18,6 +18,10 @@ class Link
     public $description;
     public $currency;
     public $shortUrl;
+    public $views;
+    public $previewUrl;
+    public $purchases;
+    public $balance;
 
     public function __construct(array $params = array())
     {
@@ -28,6 +32,10 @@ class Link
         $this->description = '';
         $this->currency    = '';
         $this->shortUrl    = '';
+        $this->views       = 0;
+        $this->previewUrl  = null;
+        $this->purchases   = 0;
+        $this->balance     = '';
 
         foreach ($params as $key => $param) {
             if (property_exists($this, $key)) {
