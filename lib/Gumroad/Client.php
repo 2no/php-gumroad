@@ -119,6 +119,18 @@ class Client
         return $this;
     }
 
+    public function enableLink(Link $link)
+    {
+        $url = $this->getLinkUrl($link->id) . '/enable';
+        $this->_request('PUT', $url);
+    }
+
+    public function disableLink(Link $link)
+    {
+        $url = $this->getLinkUrl($link->id) . '/disable';
+        $this->_request('PUT', $url);
+    }
+
     public function getLink($id)
     {
         $url = $this->getLinkUrl($id);
